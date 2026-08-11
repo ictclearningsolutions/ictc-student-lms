@@ -144,7 +144,7 @@ function getCourseProgress(course, studentId, courseId) {
 
 function serializeSessionUser(usr) {
   if (usr) {
-    return { id: usr.id, username: usr.username, full_name: usr.full_name };
+    return { id: usr.id, username: usr.username, full_name: usr.full_name, avatar: usr.avatar || '' };
   }
   return null;
 }
@@ -187,6 +187,43 @@ app.post('/admin/login', (req, res) => {
 app.get('/admin/logout', (req, res) => {
   req.session.destroy();
   res.redirect('/admin/login');
+});
+
+// ================= ADMIN PROFILE =================
+
+app.get('/admin/profile', adminAuth, (req, res) => {
+  const admin = row("SELECT * FROM admins WHERE id = ?", [req.session.admin.id]);
+  res.render('admin/profile', {
+    admin,
+    message: req.query.updated === '1' ? 'Profile updated' : null,
+    error: req.query.error || null
+  });
+});
+
+app.post('/admin/profile', adminAuth, (req, res) => {
+  getDb().run("UPDATE admins SET full_name = ? WHERE id = ?", [req.body.full_name, req.session.admin.id]);
+  saveDatabase();
+  req.session.admin.full_name = req.body.full_name;
+  res.redirect('/admin/profile?updated=1');
+});
+
+app.post('/admin/profile/avatar', adminAuth, uploadAvatar.single('avatar'), (req, res) => {
+  if (!req.file) {
+    return res.redirect('/admin/profile?error=' + encodeURIComponent('Please choose an image file'));
+  }
+  const db = getDb();
+  const admin = row("SELECT * FROM admins WHERE id = ?", [req.session.admin.id]);
+  if (admin && admin.avatar) {
+    const oldPath = path.join(__dirname, admin.avatar.replace(/^\/+/, ''));
+    if (admin.avatar.startsWith('/uploads/') && fs.existsSync(oldPath)) {
+      try { fs.unlinkSync(oldPath); } catch (e) { /* ignore */ }
+    }
+  }
+  const avatarPath = '/uploads/avatars/' + req.file.filename;
+  db.run("UPDATE admins SET avatar = ? WHERE id = ?", [avatarPath, req.session.admin.id]);
+  saveDatabase();
+  req.session.admin.avatar = avatarPath;
+  res.redirect('/admin/profile?updated=1');
 });
 
 // ================= ADMIN DASHBOARD =================
@@ -459,8 +496,10 @@ app.post('/profile/avatar', studentAuth, uploadAvatar.single('avatar'), (req, re
 });
 
 app.use((err, req, res, next) => {
-  if (err && err.message) {
-    return res.redirect('/profile?error=' + encodeURIComponent(err.message));
+  const isUploadError = err instanceof multer.MulterError || /image file/i.test(err.message || '');
+  if (isUploadError) {
+    const back = String(req.originalUrl || '').startsWith('/admin') ? '/admin/profile' : '/profile';
+    return res.redirect(back + '?error=' + encodeURIComponent(err.message || 'Upload failed'));
   }
   next(err);
 });

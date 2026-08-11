@@ -24,6 +24,7 @@ async function initDatabase() {
       username TEXT UNIQUE NOT NULL,
       password TEXT NOT NULL,
       full_name TEXT NOT NULL,
+      avatar TEXT DEFAULT '',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
@@ -96,10 +97,15 @@ async function initDatabase() {
 }
 
 function migrate() {
-  const cols = db.exec("PRAGMA table_info(students)");
-  const colNames = cols.length ? cols[0].values.map(r => r[1]) : [];
-  if (!colNames.includes('avatar')) {
+  const studCols = db.exec("PRAGMA table_info(students)");
+  const studNames = studCols.length ? studCols[0].values.map(r => r[1]) : [];
+  if (!studNames.includes('avatar')) {
     db.run("ALTER TABLE students ADD COLUMN avatar TEXT DEFAULT ''");
+  }
+  const admCols = db.exec("PRAGMA table_info(admins)");
+  const admNames = admCols.length ? admCols[0].values.map(r => r[1]) : [];
+  if (!admNames.includes('avatar')) {
+    db.run("ALTER TABLE admins ADD COLUMN avatar TEXT DEFAULT ''");
   }
 }
 

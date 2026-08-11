@@ -1,7 +1,16 @@
 ﻿<%- include('../partials/header', { title: 'My Courses', activeNav: 'dashboard' }) %>
 <div class="wrap">
-  <h1 class="page-title">My Courses</h1>
-  <p class="muted mb-2">Hi <%= student.full_name || student.student_id %>, here are the courses you are enrolled in.</p>
+  <div class="flex mb-2" style="align-items:center;">
+    <% if (student.avatar) { %>
+    <img class="avatar-md" src="<%= student.avatar %>" alt="DP">
+    <% } else { %>
+    <span class="avatar-md"><%= (student.full_name || student.student_id).charAt(0).toUpperCase() %></span>
+    <% } %>
+    <div style="flex:1;">
+      <h1 class="page-title" style="margin-bottom:4px;">Hi <%= student.full_name || student.student_id %></h1>
+      <p class="muted">Here are the courses you are enrolled in.</p>
+    </div>
+  </div>
 
   <% if (courses.length === 0) { %>
     <div class="card empty-state">

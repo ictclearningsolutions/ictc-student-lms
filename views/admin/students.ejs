@@ -45,6 +45,7 @@
       <table>
         <thead>
           <tr>
+            <th></th>
             <th>Student ID</th><th>Name</th><th>Email</th><th>Mobile</th>
             <th>Courses</th><th>Status</th><th>Actions</th>
           </tr>
@@ -52,6 +53,13 @@
         <tbody>
           <% students.forEach(s => { %>
           <tr>
+            <td>
+              <% if (s.avatar) { %>
+              <img class="avatar-sm" src="<%= s.avatar %>" alt="<%= s.student_id %>">
+              <% } else { %>
+              <span class="avatar-sm"><%= (s.full_name || s.student_id).charAt(0).toUpperCase() %></span>
+              <% } %>
+            </td>
             <td><strong><%= s.student_id %></strong></td>
             <td><%= s.full_name || '—' %></td>
             <td><%= s.email || '—' %></td>

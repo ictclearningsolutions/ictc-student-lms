@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+<% if (typeof activeNav === 'undefined') { var activeNav = ''; } %>
 <% if (admin) { %>
 <header class="topbar">
   <div class="topbar-inner">
@@ -21,9 +22,16 @@
       <span>ICTC Admin<small>Student Learning Portal</small></span>
     </a>
     <nav class="nav-links">
-      <a href="/admin/dashboard">Dashboard</a>
-      <a href="/admin/students">Students</a>
-      <a href="/admin/courses">Courses</a>
+      <a href="/admin/dashboard" class="<%= activeNav === 'dashboard' ? 'active' : '' %>">Dashboard</a>
+      <a href="/admin/students" class="<%= activeNav === 'students' ? 'active' : '' %>">Students</a>
+      <a href="/admin/courses" class="<%= activeNav === 'courses' ? 'active' : '' %>">Courses</a>
+      <a href="/admin/profile" title="My profile">
+        <% if (admin.avatar) { %>
+        <img class="avatar-nav" src="<%= admin.avatar %>" alt="DP">
+        <% } else { %>
+        <span class="avatar-nav avatar-placeholder"><%= admin.full_name.charAt(0).toUpperCase() %></span>
+        <% } %>
+      </a>
       <a href="/admin/logout">Logout</a>
     </nav>
   </div>

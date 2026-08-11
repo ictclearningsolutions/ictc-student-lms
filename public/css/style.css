@@ -74,6 +74,12 @@ a:hover { text-decoration: underline; }
   vertical-align: middle; background: var(--primary-light); color: var(--primary);
   font-weight: 800; font-size: 0.85rem;
 }
+.avatar-md {
+  width: 56px; height: 56px; border-radius: 50%; object-fit: cover;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--primary-light); color: var(--primary);
+  font-weight: 800; font-size: 1.3rem;
+}
 
 /* ---------- Layout ---------- */
 .wrap { max-width: 1040px; margin: 0 auto; padding: 16px; }

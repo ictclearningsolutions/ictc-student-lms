@@ -1,0 +1,39 @@
+<%- include('../partials/header', { title: 'My Profile', activeNav: 'profile' }) %>
+<div class="wrap">
+  <h1 class="page-title">My Profile</h1>
+  <% if (message) { %><div class="alert alert-green"><%= message %></div><% } %>
+  <% if (error) { %><div class="alert alert-red"><%= error %></div><% } %>
+
+  <div class="card" style="text-align:center;">
+    <h3>Profile picture</h3>
+    <div class="mt-2 mb-2" style="display:flex; justify-content:center;">
+      <% if (admin.avatar) { %>
+      <img class="avatar-lg" src="<%= admin.avatar %>" alt="Your profile picture">
+      <% } else { %>
+      <span class="avatar-lg"><%= admin.full_name.charAt(0).toUpperCase() %></span>
+      <% } %>
+    </div>
+    <form method="POST" action="/admin/profile/avatar" enctype="multipart/form-data">
+      <div class="form-row">
+        <input type="file" name="avatar" accept="image/*" required>
+      </div>
+      <button type="submit" class="btn btn-sm">Upload new picture</button>
+      <p class="form-hint">JPG, PNG or GIF &middot; max 2 MB</p>
+    </form>
+  </div>
+
+  <div class="card">
+    <form method="POST" action="/admin/profile">
+      <div class="form-row">
+        <label for="full_name">Full name</label>
+        <input type="text" id="full_name" name="full_name" value="<%= admin.full_name %>">
+      </div>
+      <div class="form-row">
+        <label>Username</label>
+        <input type="text" value="<%= admin.username %>" disabled>
+      </div>
+      <button type="submit" class="btn">Save profile</button>
+    </form>
+  </div>
+</div>
+<%- include('../partials/footer') %>
