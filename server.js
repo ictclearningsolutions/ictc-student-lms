@@ -196,7 +196,9 @@ app.get('/admin/profile', adminAuth, (req, res) => {
   res.render('admin/profile', {
     admin,
     message: req.query.updated === '1' ? 'Profile updated' : null,
-    error: req.query.error || null
+    error: req.query.error || null,
+    pwError: req.query.pwerror || null,
+    pwOk: req.query.pwok === '1'
   });
 });
 
@@ -224,6 +226,23 @@ app.post('/admin/profile/avatar', adminAuth, uploadAvatar.single('avatar'), (req
   saveDatabase();
   req.session.admin.avatar = avatarPath;
   res.redirect('/admin/profile?updated=1');
+});
+
+app.post('/admin/profile/password', adminAuth, (req, res) => {
+  const { current_password, new_password, confirm_password } = req.body;
+  const admin = row("SELECT * FROM admins WHERE id = ?", [req.session.admin.id]);
+  if (!bcrypt.compareSync(current_password, admin.password)) {
+    return res.redirect('/admin/profile?pwerror=' + encodeURIComponent('Current password is incorrect'));
+  }
+  if (!new_password || new_password.length < 6) {
+    return res.redirect('/admin/profile?pwerror=' + encodeURIComponent('New password must be at least 6 characters'));
+  }
+  if (new_password !== confirm_password) {
+    return res.redirect('/admin/profile?pwerror=' + encodeURIComponent('New passwords do not match'));
+  }
+  getDb().run("UPDATE admins SET password = ? WHERE id = ?", [bcrypt.hashSync(new_password, 10), admin.id]);
+  saveDatabase();
+  res.redirect('/admin/profile?pwok=1');
 });
 
 // ================= ADMIN DASHBOARD =================
@@ -463,7 +482,9 @@ app.get('/profile', studentAuth, (req, res) => {
   res.render('student/profile', {
     student,
     message: req.query.updated === '1' ? 'Profile updated' : null,
-    error: req.query.error || null
+    error: req.query.error || null,
+    pwError: req.query.pwerror || null,
+    pwOk: req.query.pwok === '1'
   });
 });
 
@@ -493,6 +514,24 @@ app.post('/profile/avatar', studentAuth, uploadAvatar.single('avatar'), (req, re
   saveDatabase();
   req.session.student.avatar = avatarPath;
   res.redirect('/profile?updated=1');
+});
+
+app.post('/profile/password', studentAuth, (req, res) => {
+  const { current_password, new_password, confirm_password } = req.body;
+  const student = row("SELECT * FROM students WHERE student_id = ?", [req.session.student.student_id]);
+  if (!bcrypt.compareSync(current_password, student.password)) {
+    return res.redirect('/profile?pwerror=' + encodeURIComponent('Current password is incorrect'));
+  }
+  if (!new_password || new_password.length < 6) {
+    return res.redirect('/profile?pwerror=' + encodeURIComponent('New password must be at least 6 characters'));
+  }
+  if (new_password !== confirm_password) {
+    return res.redirect('/profile?pwerror=' + encodeURIComponent('New passwords do not match'));
+  }
+  getDb().run("UPDATE students SET password = ? WHERE student_id = ?",
+    [bcrypt.hashSync(new_password, 10), student.student_id]);
+  saveDatabase();
+  res.redirect('/profile?pwok=1');
 });
 
 app.use((err, req, res, next) => {
