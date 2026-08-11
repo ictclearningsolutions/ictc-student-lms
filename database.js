@@ -36,12 +36,15 @@ async function initDatabase() {
       full_name TEXT DEFAULT '',
       email TEXT DEFAULT '',
       mobile TEXT DEFAULT '',
+      avatar TEXT DEFAULT '',
       is_active INTEGER DEFAULT 1,
       profile_updated INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       last_login DATETIME
     );
   `);
+
+  migrate();
 
   db.run(`
     CREATE TABLE IF NOT EXISTS courses (
@@ -90,6 +93,14 @@ async function initDatabase() {
 
   saveDatabase();
   return db;
+}
+
+function migrate() {
+  const cols = db.exec("PRAGMA table_info(students)");
+  const colNames = cols.length ? cols[0].values.map(r => r[1]) : [];
+  if (!colNames.includes('avatar')) {
+    db.run("ALTER TABLE students ADD COLUMN avatar TEXT DEFAULT ''");
+  }
 }
 
 function seedAdmin() {

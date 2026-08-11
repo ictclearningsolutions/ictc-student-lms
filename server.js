@@ -2,15 +2,39 @@ const express = require('express');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 const { initDatabase, getDb, saveDatabase } = require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+const UPLOAD_DIR = path.join(__dirname, 'uploads');
+const AVATAR_DIR = path.join(UPLOAD_DIR, 'avatars');
+fs.mkdirSync(AVATAR_DIR, { recursive: true });
+
+const avatarStorage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, AVATAR_DIR),
+  filename: (req, file, cb) => {
+    const ext = (file.originalname.match(/\.([a-zA-Z0-9]+)$/) || [])[1] || 'png';
+    cb(null, Date.now() + '-' + uuidv4().slice(0, 8) + '.' + ext);
+  }
+});
+
+const uploadAvatar = multer({
+  storage: avatarStorage,
+  limits: { fileSize: 2 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) cb(null, true);
+    else cb(new Error('Only image files are allowed'));
+  }
+});
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
@@ -386,7 +410,7 @@ app.post('/login', (req, res) => {
   }
   getDb().run("UPDATE students SET last_login = datetime('now') WHERE student_id = ?", [student.student_id]);
   saveDatabase();
-  req.session.student = { student_id: student.student_id, full_name: student.full_name, email: student.email };
+  req.session.student = { student_id: student.student_id, full_name: student.full_name, email: student.email, avatar: student.avatar || '' };
   res.redirect('/dashboard');
 });
 
@@ -399,7 +423,11 @@ app.get('/logout', (req, res) => {
 
 app.get('/profile', studentAuth, (req, res) => {
   const student = row("SELECT * FROM students WHERE student_id = ?", [req.session.student.student_id]);
-  res.render('student/profile', { student, message: req.query.updated === '1' ? 'Profile updated' : null });
+  res.render('student/profile', {
+    student,
+    message: req.query.updated === '1' ? 'Profile updated' : null,
+    error: req.query.error || null
+  });
 });
 
 app.post('/profile', studentAuth, (req, res) => {
@@ -409,6 +437,32 @@ app.post('/profile', studentAuth, (req, res) => {
   req.session.student.full_name = req.body.full_name;
   req.session.student.email = req.body.email;
   res.redirect('/profile?updated=1');
+});
+
+app.post('/profile/avatar', studentAuth, uploadAvatar.single('avatar'), (req, res) => {
+  if (!req.file) {
+    return res.redirect('/profile?error=' + encodeURIComponent('Please choose an image file'));
+  }
+  const db = getDb();
+  const student = row("SELECT * FROM students WHERE student_id = ?", [req.session.student.student_id]);
+  if (student && student.avatar) {
+    const oldPath = path.join(__dirname, student.avatar.replace(/^\/+/, ''));
+    if (student.avatar.startsWith('/uploads/') && fs.existsSync(oldPath)) {
+      try { fs.unlinkSync(oldPath); } catch (e) { /* ignore */ }
+    }
+  }
+  const avatarPath = '/uploads/avatars/' + req.file.filename;
+  db.run("UPDATE students SET avatar = ? WHERE student_id = ?", [avatarPath, req.session.student.student_id]);
+  saveDatabase();
+  req.session.student.avatar = avatarPath;
+  res.redirect('/profile?updated=1');
+});
+
+app.use((err, req, res, next) => {
+  if (err && err.message) {
+    return res.redirect('/profile?error=' + encodeURIComponent(err.message));
+  }
+  next(err);
 });
 
 // ================= STUDENT DASHBOARD =================

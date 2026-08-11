@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -7,8 +7,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="icon" type="image/png" href="/icons/logo-192.png">
-  <link rel="apple-touch-icon" href="/icons/logo-192.png">
+  <link rel="icon" type="image/png" href="/icons/logo.png">
+  <link rel="apple-touch-icon" href="/icons/logo.png">
   <title><%= title ? title + ' - ' : '' %>ICTC Student LMS</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
@@ -17,7 +17,7 @@
 <header class="topbar">
   <div class="topbar-inner">
     <a class="brand" href="/admin/dashboard">
-      <img src="/icons/logo-192.png" alt="ICTC">
+      <img src="/icons/logo.png" alt="ICTC">
       <span>ICTC Admin<small>Student Learning Portal</small></span>
     </a>
     <nav class="nav-links">
@@ -32,12 +32,19 @@
 <header class="topbar">
   <div class="topbar-inner">
     <a class="brand" href="/dashboard">
-      <img src="/icons/logo-192.png" alt="ICTC">
+      <img src="/icons/logo.png" alt="ICTC">
       <span>ICTC LMS<small><%= student.full_name || student.student_id %></small></span>
     </a>
     <nav class="nav-links">
       <a href="/dashboard" class="<%= activeNav === 'dashboard' ? 'active' : '' %>">My Courses</a>
       <a href="/profile" class="<%= activeNav === 'profile' ? 'active' : '' %>">Profile</a>
+      <a href="/profile" title="Change profile picture">
+        <% if (student.avatar) { %>
+        <img class="avatar-nav" src="<%= student.avatar %>" alt="DP">
+        <% } else { %>
+        <span class="avatar-nav avatar-placeholder" data-name="<%= student.full_name || student.student_id %>"><%= (student.full_name || student.student_id).charAt(0).toUpperCase() %></span>
+        <% } %>
+      </a>
       <a href="/logout">Logout</a>
     </nav>
   </div>
