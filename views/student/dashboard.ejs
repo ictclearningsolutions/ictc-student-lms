@@ -1,0 +1,50 @@
+<%- include('../partials/header', { title: 'My Courses', activeNav: 'dashboard' }) %>
+<div class="wrap">
+  <h1 class="page-title">My Courses</h1>
+  <p class="muted mb-2">Hi <%= student.full_name || student.student_id %>, here are the courses you are enrolled in.</p>
+
+  <% if (courses.length === 0) { %>
+    <div class="card empty-state">
+      <div class="big">No courses yet</div>
+      You are not enrolled in any courses yet.<br>
+      Contact ICTC administration to get enrolled.
+    </div>
+  <% } %>
+
+  <div class="grid grid-2">
+    <% courses.forEach(item => { const c = item.course; %>
+    <a class="card course-card" href="/courses/<%= c.id %>" style="color:inherit">
+      <div class="course-top">
+        <span class="course-code"><%= c.code %></span>
+        <span class="badge badge-blue"><%= c.category || 'Course' %></span>
+      </div>
+      <div class="course-title"><%= c.title %></div>
+      <div class="course-meta">
+        <span>Duration: <%= c.duration || '—' %></span>
+        <span>Trainer: <%= c.trainer_name || '—' %></span>
+      </div>
+      <p class="muted small mb-2"><%= (c.description || '').slice(0, 110) %><%= (c.description || '').length > 110 ? '…' : '' %></p>
+      <div class="progress-wrap">
+        <div class="progress-track">
+          <div class="progress-fill <%= item.progress === 100 ? 'done' : '' %>" style="width:<%= item.progress %>%"></div>
+        </div>
+        <span class="progress-label"><%= item.progress %>%</span>
+      </div>
+    </a>
+    <% }) %>
+  </div>
+
+  <% if (upcomingSessions.length > 0) { %>
+  <div class="card mt-2">
+    <h3>Upcoming sessions</h3>
+    <% upcomingSessions.forEach(s => { %>
+    <div class="session-item">
+      <span class="session-date"><%= s.next.date %> &middot; <%= s.next.time %></span>
+      <span><strong><%= s.course %></strong> &mdash; <%= s.next.topic %></span>
+      <span class="session-tag <%= (s.next.mode || '').toLowerCase() %>"><%= s.next.mode || 'Onsite' %></span>
+    </div>
+    <% }) %>
+  </div>
+  <% } %>
+</div>
+<%- include('../partials/footer') %>

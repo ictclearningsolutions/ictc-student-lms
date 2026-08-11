@@ -1,0 +1,35 @@
+<%- include('../partials/header', { title: assessment.title, activeNav: 'dashboard' }) %>
+<div class="wrap">
+  <div class="mb-2">
+    <a class="muted small" href="/courses/<%= course.id %>">&larr; Back to <%= course.title %></a>
+  </div>
+
+  <div class="card">
+    <h1 class="page-title"><%= assessment.title %></h1>
+    <p class="muted">
+      <%= assessment.questions.length %> questions &middot; Pass mark: <%= assessment.passing %>% &middot; Course: <%= course.code %>
+    </p>
+    <% if (prior) { %>
+      <div class="alert <%= prior.passed === 1 ? 'alert-green' : 'alert-red' %> mt-2">
+        Previous attempt: <%= prior.score %>/<%= prior.total %> (<%= Math.round(prior.score / prior.total * 100) %>%) &mdash;
+        <%= prior.passed === 1 ? 'Passed' : 'Not passed yet' %>
+      </div>
+    <% } %>
+  </div>
+
+  <form method="POST" action="/courses/<%= course.id %>/assessment/<%= index %>" class="card" id="quiz-form">
+    <% assessment.questions.forEach((q, qi) => { %>
+    <div class="question-block">
+      <div class="question-text">Q<%= qi + 1 %>. <%= q.q %></div>
+      <% q.options.forEach((opt, oi) => { %>
+      <label class="option-row">
+        <input type="radio" name="q<%= qi %>" value="<%= oi %>" required>
+        <%= opt %>
+      </label>
+      <% }) %>
+    </div>
+    <% }) %>
+    <button type="submit" class="btn btn-block">Submit answers</button>
+  </form>
+</div>
+<%- include('../partials/footer') %>

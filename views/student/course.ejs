@@ -1,0 +1,97 @@
+<%- include('../partials/header', { title: course.title, activeNav: 'dashboard' }) %>
+<div class="wrap">
+  <div class="mb-2">
+    <a class="muted small" href="/dashboard">&larr; Back to My Courses</a>
+  </div>
+
+  <div class="card">
+    <div class="course-top">
+      <span class="course-code"><%= course.code %></span>
+      <span class="badge badge-blue"><%= course.category || 'Course' %></span>
+    </div>
+    <h1 class="course-title" style="font-size:1.5rem; margin-top:10px;"><%= course.title %></h1>
+    <div class="course-meta">
+      <span>Duration: <%= course.duration || '—' %></span>
+      <span>Trainer: <%= course.trainer_name || '—' %></span>
+    </div>
+    <p><%= course.description || 'No description provided.' %></p>
+
+    <div class="progress-wrap mt-2">
+      <div class="progress-track">
+        <div class="progress-fill <%= prog.progress === 100 ? 'done' : '' %>" style="width:<%= prog.progress %>%"></div>
+      </div>
+      <span class="progress-label"><%= prog.progress %>% complete</span>
+    </div>
+    <p class="muted small mt-1">Assessments passed: <%= prog.passedCount %> / <%= prog.totalAssessments || 0 %></p>
+  </div>
+
+  <% if (course.trainer_name) { %>
+  <div class="card">
+    <h3>Trainer</h3>
+    <p><strong><%= course.trainer_name %></strong></p>
+    <p class="muted"><%= course.trainer_contact || '—' %></p>
+  </div>
+  <% } %>
+
+  <% if (data.syllabus.length > 0) { %>
+  <div class="card">
+    <h3>Syllabus</h3>
+    <ol class="mb-1" style="padding-left:22px;">
+      <% data.syllabus.forEach(t => { %><li class="mb-1"><%= t %></li><% }) %>
+    </ol>
+  </div>
+  <% } %>
+
+  <% if (data.sessions.length > 0) { %>
+  <div class="card">
+    <h3>Schedule &amp; classes</h3>
+    <% data.sessions.forEach(s => { %>
+    <div class="session-item">
+      <span class="session-date"><%= s.date %> &middot; <%= s.time %></span>
+      <span><%= s.topic %></span>
+      <span class="session-tag <%= (s.mode || '').toLowerCase() %>"><%= s.mode || 'Onsite' %></span>
+      <% if (s.link) { %><a class="btn btn-sm btn-outline" href="<%= s.link %>" target="_blank" rel="noopener">Join online</a><% } %>
+    </div>
+    <% }) %>
+  </div>
+  <% } %>
+
+  <% if (data.materials.length > 0) { %>
+  <div class="card">
+    <h3>Course materials</h3>
+    <% data.materials.forEach(m => { %>
+    <div class="material-item">
+      <span class="material-type <%= (m.type || '').toLowerCase() %>"><%= m.type || 'Link' %></span>
+      <span style="flex:1"><%= m.title || 'Material' %></span>
+      <a class="btn btn-sm btn-outline" href="<%= m.url %>" target="_blank" rel="noopener">Open</a>
+    </div>
+    <% }) %>
+  </div>
+  <% } %>
+
+  <div class="card">
+    <h3>Assessments &amp; progress</h3>
+    <% if (prog.totalAssessments === 0) { %>
+      <p class="muted">No assessments assigned yet.</p>
+    <% } else { %>
+      <% prog.results.forEach((r, i) => { %>
+      <div class="material-item">
+        <span style="flex:1">
+          <strong><%= r.title %></strong><br>
+          <span class="muted small">
+            <% if (r.attempts === 0) { %>Not attempted yet
+            <% } else if (r.passed) { %>Passed with <%= r.bestScore %>% (best of <%= r.attempts %> attempt<%= r.attempts > 1 ? 's' : '' %>)
+            <% } else { %>Best score <%= r.bestScore %>% &mdash; needs <%= r.passing %>% to pass
+            <% } %>
+          </span>
+        </span>
+        <% if (r.passed) { %><span class="badge badge-green">Completed</span><% } %>
+        <a class="btn btn-sm <%= r.passed ? 'btn-gray' : '' %>" href="/courses/<%= course.id %>/assessment/<%= i %>">
+          <%= r.attempts === 0 ? 'Start' : (r.passed ? 'Review' : 'Retake') %>
+        </a>
+      </div>
+      <% }) %>
+    <% } %>
+  </div>
+</div>
+<%- include('../partials/footer') %>

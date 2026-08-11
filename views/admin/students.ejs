@@ -1,0 +1,82 @@
+<%- include('../partials/header', { title: 'Students' }) %>
+<div class="wrap">
+  <div class="flex-between mb-2">
+    <h1 class="page-title">Students</h1>
+    <span class="muted small">Default password: <code>ictc2026</code></span>
+  </div>
+
+  <% if (message) { %><div class="alert alert-green"><%= message %></div><% } %>
+
+  <div class="card">
+    <h3>Create student account(s)</h3>
+    <form method="POST" action="/admin/students/add" class="grid grid-2">
+      <div class="form-row">
+        <label for="student_id">Student ID (optional - leave blank to auto-generate)</label>
+        <input type="text" id="student_id" name="student_id" placeholder="e.g. ICTC-STU-101">
+      </div>
+      <div class="form-row">
+        <label for="full_name">Full name</label>
+        <input type="text" id="full_name" name="full_name" placeholder="e.g. Ahmed Khan">
+      </div>
+      <div class="form-row">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="student@ictc.edu">
+      </div>
+      <div class="form-row">
+        <label for="mobile">Mobile</label>
+        <input type="tel" id="mobile" name="mobile" placeholder="e.g. 9876543210">
+      </div>
+      <div class="form-row">
+        <label for="count">Batch size (when auto-generating)</label>
+        <input type="number" id="count" name="count" value="1" min="1" max="100">
+      </div>
+      <div class="form-row">
+        <button type="submit" class="btn">Create account(s)</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>All students (<%= students.length %>)</h3>
+    <% if (students.length === 0) { %>
+      <div class="empty-state"><div class="big">No students yet.</div></div>
+    <% } else { %>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Student ID</th><th>Name</th><th>Email</th><th>Mobile</th>
+            <th>Courses</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% students.forEach(s => { %>
+          <tr>
+            <td><strong><%= s.student_id %></strong></td>
+            <td><%= s.full_name || '—' %></td>
+            <td><%= s.email || '—' %></td>
+            <td><%= s.mobile || '—' %></td>
+            <td><%= s.course_count %></td>
+            <td>
+              <% if (s.is_active === 1) { %><span class="badge badge-green">Active</span>
+              <% } else { %><span class="badge badge-red">Inactive</span><% } %>
+            </td>
+            <td class="flex">
+              <form method="POST" action="/admin/students/toggle" class="mb-1">
+                <input type="hidden" name="student_id" value="<%= s.student_id %>">
+                <button class="btn btn-sm btn-gray" type="submit"><%= s.is_active === 1 ? 'Deactivate' : 'Activate' %></button>
+              </form>
+              <form method="POST" action="/admin/students/delete" onsubmit="return confirm('Delete <%= s.student_id %> and all their data?')">
+                <input type="hidden" name="student_id" value="<%= s.student_id %>">
+                <button class="btn btn-sm btn-red" type="submit">Delete</button>
+              </form>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </div>
+</div>
+<%- include('../partials/footer') %>

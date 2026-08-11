@@ -1,0 +1,28 @@
+{
+  "name": "ictc-student-lms",
+  "version": "1.0.0",
+  "description": "ICTC Student LMS - Mobile & web friendly learning portal for ICTC students to view their enrolled courses, schedules, trainers, materials and progress.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "lms",
+    "learning",
+    "ictc",
+    "students",
+    "courses"
+  ],
+  "author": "ICTC Learning Solutions Private Limited",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "sql.js": "^1.14.1",
+    "uuid": "^14.0.1"
+  }
+}

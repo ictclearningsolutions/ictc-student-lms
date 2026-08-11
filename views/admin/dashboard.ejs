@@ -1,0 +1,78 @@
+<%- include('../partials/header', { title: 'Admin Dashboard' }) %>
+<div class="wrap">
+  <div class="flex-between mb-2">
+    <h1 class="page-title">Welcome, <%= admin.full_name %></h1>
+    <a class="btn btn-sm" href="/admin/courses/new">+ New Course</a>
+  </div>
+
+  <div class="grid grid-3 mb-2">
+    <div class="card stat-card">
+      <div class="stat-value"><%= stats.students %></div>
+      <div class="stat-label">Total Students</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value"><%= stats.courses %></div>
+      <div class="stat-label">Courses</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value"><%= stats.enrollments %></div>
+      <div class="stat-label">Enrollments</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="flex-between mb-1">
+      <h3>Recent Students</h3>
+      <a class="btn btn-sm btn-outline" href="/admin/students">Manage students</a>
+    </div>
+    <% if (recentStudents.length === 0) { %>
+      <div class="empty-state"><div class="big">No students yet</div>No students yet. Create accounts from the Students page.</div>
+    <% } else { %>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Student ID</th><th>Name</th><th>Email</th><th>Status</th></tr></thead>
+        <tbody>
+          <% recentStudents.forEach(s => { %>
+          <tr>
+            <td><strong><%= s.student_id %></strong></td>
+            <td><%= s.full_name || '—' %></td>
+            <td><%= s.email || '—' %></td>
+            <td>
+              <% if (s.is_active === 1) { %><span class="badge badge-green">Active</span>
+              <% } else { %><span class="badge badge-red">Inactive</span><% } %>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </div>
+
+  <div class="card">
+    <div class="flex-between mb-1">
+      <h3>Courses</h3>
+      <a class="btn btn-sm btn-outline" href="/admin/courses">Manage courses</a>
+    </div>
+    <div class="grid grid-3">
+      <% courseList.forEach(c => { %>
+      <div class="card course-card">
+        <div class="course-top">
+          <span class="course-code"><%= c.code %></span>
+          <span class="badge badge-blue"><%= c.enrolled_count %> enrolled</span>
+        </div>
+        <div class="course-title"><%= c.title %></div>
+        <div class="course-meta">
+          <span><%= c.duration || '—' %></span>
+          <span><%= c.trainer_name || '—' %></span>
+        </div>
+        <div class="flex">
+          <a class="btn btn-sm btn-outline" href="/admin/courses/<%= c.id %>/progress">Progress</a>
+          <a class="btn btn-sm btn-outline" href="/admin/courses/<%= c.id %>/enroll">Enroll</a>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

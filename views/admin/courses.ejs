@@ -1,0 +1,42 @@
+<%- include('../partials/header', { title: 'Courses' }) %>
+<div class="wrap">
+  <div class="flex-between mb-2">
+    <h1 class="page-title">Courses</h1>
+    <a class="btn btn-sm" href="/admin/courses/new">+ New Course</a>
+  </div>
+
+  <% if (message) { %><div class="alert alert-green"><%= message %></div><% } %>
+
+  <% if (courses.length === 0) { %>
+    <div class="card empty-state">
+      <div class="big">No courses yet</div>
+      Click "New Course" to create one.
+    </div>
+  <% } %>
+
+  <div class="grid grid-3">
+    <% courses.forEach(c => { %>
+    <div class="card course-card">
+      <div class="course-top">
+        <span class="course-code"><%= c.code %></span>
+        <span class="badge badge-blue"><%= c.student_count %> students</span>
+      </div>
+      <div class="course-title"><%= c.title %></div>
+      <div class="course-meta">
+        <span><%= c.category || '—' %></span>
+        <span><%= c.duration || '—' %></span>
+      </div>
+      <div class="muted small mb-2"><%= (c.description || '').slice(0, 90) %><%= (c.description || '').length > 90 ? '…' : '' %></div>
+      <div class="flex">
+        <a class="btn btn-sm btn-outline" href="/admin/courses/<%= c.id %>/edit">Edit</a>
+        <a class="btn btn-sm btn-outline" href="/admin/courses/<%= c.id %>/enroll">Enroll</a>
+        <a class="btn btn-sm btn-outline" href="/admin/courses/<%= c.id %>/progress">Progress</a>
+        <form method="POST" action="/admin/courses/<%= c.id %>/delete" onsubmit="return confirm('Delete this course and its enrollments?')">
+          <button class="btn btn-sm btn-red" type="submit">Delete</button>
+        </form>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+</div>
+<%- include('../partials/footer') %>

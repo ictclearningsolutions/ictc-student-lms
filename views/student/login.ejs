@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1a4f8b">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" type="image/png" href="/icons/logo-192.png">
+  <title>Student Login - ICTC Student LMS</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-card card">
+    <div class="auth-logo">
+      <img src="/icons/logo-192.png" alt="ICTC">
+      <h1>ICTC Student LMS</h1>
+      <p>View your enrolled courses, schedule, materials &amp; progress</p>
+    </div>
+    <% if (error) { %><div class="alert alert-red"><%= error %></div><% } %>
+    <form method="POST" action="/login">
+      <div class="form-row">
+        <label for="student_id">Student ID</label>
+        <input type="text" id="student_id" name="student_id" required autofocus autocomplete="username" placeholder="e.g. ICTC-STU-001">
+      </div>
+      <div class="form-row">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="Provided by ICTC">
+      </div>
+      <button type="submit" class="btn btn-block">Sign in</button>
+    </form>
+    <p class="muted small mt-2">Login details are provided by your institute after enrollment.</p>
+  </div>
+</div>
+</body>
+</html>

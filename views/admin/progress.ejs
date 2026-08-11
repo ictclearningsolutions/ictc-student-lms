@@ -1,0 +1,58 @@
+<%- include('../partials/header', { title: 'Course Progress' }) %>
+<div class="wrap">
+  <div class="flex-between mb-2">
+    <h1 class="page-title">Progress &mdash; <%= course.title %></h1>
+    <div class="flex">
+      <a class="btn btn-sm btn-outline" href="/admin/courses/<%= course.id %>/enroll">Enroll</a>
+      <a class="btn btn-sm btn-outline" href="/admin/courses">Back</a>
+    </div>
+  </div>
+
+  <% if (rows.length === 0) { %>
+    <div class="card empty-state">
+      <div class="big">No students enrolled</div>
+      No students enrolled yet. <a href="/admin/courses/<%= course.id %>/enroll">Enroll students</a> to track progress.
+    </div>
+  <% } else { %>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Progress</th>
+              <th>Assessments passed</th>
+              <% rows[0] && rows[0].results.forEach(r => { %><th><%= r.title %></th><% }) %>
+            </tr>
+          </thead>
+          <tbody>
+            <% rows.forEach(r => { %>
+            <tr>
+              <td>
+                <strong><%= r.student.student_id %></strong><br>
+                <span class="muted small"><%= r.student.full_name || '—' %></span>
+              </td>
+              <td>
+                <div class="progress-track" style="width:110px;display:inline-block;">
+                  <div class="progress-fill <%= r.progress === 100 ? 'done' : '' %>" style="width:<%= r.progress %>%"></div>
+                </div>
+                <span class="muted small"><%= r.progress %>%</span>
+              </td>
+              <td><%= r.passedCount %>/<%= r.totalAssessments %></td>
+              <% r.results.forEach(res => { %>
+              <td>
+                <% if (res.attempts === 0) { %><span class="badge badge-gray">Not attempted</span>
+                <% } else if (res.passed) { %><span class="badge badge-green"><%= res.bestScore %>%</span>
+                <% } else { %><span class="badge badge-red"><%= res.bestScore %>%</span><% } %>
+                <% if (res.attempts > 0) { %><span class="muted small"> (<%= res.attempts %>x)</span><% } %>
+              </td>
+              <% }) %>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% } %>
+</div>
+<%- include('../partials/footer') %>

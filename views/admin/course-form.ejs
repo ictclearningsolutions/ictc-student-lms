@@ -1,0 +1,79 @@
+<%- include('../partials/header', { title: course ? 'Edit Course' : 'New Course' }) %>
+<div class="wrap">
+  <h1 class="page-title"><%= course ? 'Edit: ' + course.title : 'New Course' %></h1>
+
+  <form method="POST" action="/admin/courses/save">
+    <% if (course) { %><input type="hidden" name="id" value="<%= course.id %>"><% } %>
+
+    <div class="card">
+      <h3>Basic details</h3>
+      <div class="grid grid-2">
+        <div class="form-row">
+          <label for="code">Course code *</label>
+          <input type="text" id="code" name="code" required value="<%= course ? course.code : '' %>" placeholder="ICTC-XXX-101">
+        </div>
+        <div class="form-row">
+          <label for="title">Course title *</label>
+          <input type="text" id="title" name="title" required value="<%= course ? course.title : '' %>" placeholder="e.g. Digital Marketing Fundamentals">
+        </div>
+        <div class="form-row">
+          <label for="category">Category</label>
+          <input type="text" id="category" name="category" value="<%= course ? course.category : '' %>" placeholder="e.g. Marketing, Data, Communication">
+        </div>
+        <div class="form-row">
+          <label for="duration">Duration</label>
+          <input type="text" id="duration" name="duration" value="<%= course ? course.duration : '' %>" placeholder="e.g. 6 weeks">
+        </div>
+      </div>
+      <div class="form-row">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" placeholder="Short overview students will see on the course page."><%= course ? course.description : '' %></textarea>
+      </div>
+      <div class="grid grid-2">
+        <div class="form-row">
+          <label for="trainer_name">Trainer name</label>
+          <input type="text" id="trainer_name" name="trainer_name" value="<%= course ? course.trainer_name : '' %>" placeholder="e.g. Mr. Moin Khan">
+        </div>
+        <div class="form-row">
+          <label for="trainer_contact">Trainer contact</label>
+          <input type="text" id="trainer_contact" name="trainer_contact" value="<%= course ? course.trainer_contact : '' %>" placeholder="e.g. name@ictc.edu | +91 98765 43210">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Syllabus / topics</h3>
+      <p class="form-hint mb-2">One topic per line.</p>
+      <textarea id="syllabus" name="syllabus" placeholder="Week 1 - Introduction&#10;Week 2 - Core concepts"><%= fields.syllabus %></textarea>
+    </div>
+
+    <div class="card">
+      <h3>Sessions / schedule</h3>
+      <p class="form-hint mb-2">One session per line using the format:</p>
+      <div class="codebox mb-2">date | time | topic | mode | link</div>
+      <p class="form-hint mb-2">Mode is <code>Online</code> or <code>Onsite</code>. Link can be blank.</p>
+      <textarea id="sessions" name="sessions" placeholder="2026-08-18 | 10:00 - 11:30 | Introduction | Online | https://meet.google.com/...&#10;2026-08-25 | 10:00 - 11:30 | Workshop | Onsite |"><%= fields.sessions %></textarea>
+    </div>
+
+    <div class="card">
+      <h3>Materials</h3>
+      <p class="form-hint mb-2">One material per line using the format:</p>
+      <div class="codebox mb-2">type | title | url</div>
+      <p class="form-hint mb-2">Type is one of <code>Video</code>, <code>PDF</code>, <code>Slides</code>, <code>Link</code> or <code>File</code>.</p>
+      <textarea id="materials" name="materials" placeholder="Video | Meeting Skills Masterclass | https://example.com/video.mp4&#10;PDF | Handbook | https://example.com/handbook.pdf"><%= fields.materials %></textarea>
+    </div>
+
+    <div class="card">
+      <h3>Assessments / quizzes</h3>
+      <p class="form-hint mb-2">Start each assessment with <code>A:title|passing%</code>, then add questions with <code>Q:question|opt1|opt2|opt3|opt4|correctIndex</code>.</p>
+      <div class="codebox mb-2">A:Week 1 Quiz|80&#10;Q:Which function finds a value?|SUM|VLOOKUP|MEAN|COUNT|1&#10;Q:Best chart for a whole?|Line|Pie|Area|Bar|1</div>
+      <textarea id="assessments" name="assessments" placeholder="A:Quiz 1|80&#10;Q:Question text|Option A|Option B|Option C|Option D|0"><%= fields.assessments %></textarea>
+    </div>
+
+    <div class="flex">
+      <button type="submit" class="btn">Save course</button>
+      <a class="btn btn-gray" href="/admin/courses">Cancel</a>
+    </div>
+  </form>
+</div>
+<%- include('../partials/footer') %>

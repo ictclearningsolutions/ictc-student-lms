@@ -1,0 +1,43 @@
+<%- include('../partials/header', { title: 'Enroll Students' }) %>
+<div class="wrap">
+  <div class="flex-between mb-2">
+    <h1 class="page-title">Enroll students &mdash; <%= course.title %></h1>
+    <a class="btn btn-sm btn-outline" href="/admin/courses">Back to courses</a>
+  </div>
+  <% if (message) { %><div class="alert alert-green"><%= message %></div><% } %>
+
+  <form method="POST" action="/admin/courses/<%= course.id %>/enroll">
+    <div class="card">
+      <div class="flex-between mb-1">
+        <h3>Select students to enroll in <span class="badge badge-blue"><%= course.code %></span></h3>
+        <span class="muted small"><%= students.length %> students</span>
+      </div>
+      <% if (students.length === 0) { %>
+        <div class="empty-state"><div class="big">No students yet</div>No students yet. <a href="/admin/students">Create students</a> first.</div>
+      <% } %>
+      <% students.forEach(s => { %>
+      <label class="check-row">
+        <input type="checkbox" name="students" value="<%= s.student_id %>" <%= s.isEnrolled ? 'checked' : '' %>>
+        <span><strong><%= s.student_id %></strong> &mdash; <%= s.full_name || 'No name set' %></span>
+        <% if (s.isEnrolled) { %><span class="badge badge-green right">Enrolled</span><% } %>
+      </label>
+      <% }) %>
+      <% if (students.length > 0) { %>
+      <div class="mt-2 flex">
+        <button type="submit" class="btn">Save enrollment</button>
+        <button type="button" class="btn btn-gray" id="select-all">Select all</button>
+        <button type="button" class="btn btn-gray" id="clear-all">Clear all</button>
+      </div>
+      <% } %>
+    </div>
+  </form>
+</div>
+<script>
+  document.getElementById('select-all') && document.getElementById('select-all').addEventListener('click', function () {
+    document.querySelectorAll('input[name="students"]').forEach(c => c.checked = true);
+  });
+  document.getElementById('clear-all') && document.getElementById('clear-all').addEventListener('click', function () {
+    document.querySelectorAll('input[name="students"]').forEach(c => c.checked = false);
+  });
+</script>
+<%- include('../partials/footer') %>
